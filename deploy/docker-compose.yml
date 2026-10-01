@@ -1,0 +1,43 @@
+# PolyLife platform entry point: the core + ONE shared gateway.
+#
+#   docker compose -f deploy/docker-compose.yml up --build -d     (or scripts/bash/start-platform.sh)
+#
+#   http://localhost:8000            core SPA + auth API
+#   http://localhost:8000/api/teamN  team N service (forward-auth by the core)
+#
+# The core is no longer published on a host port; only the gateway is. Team
+# stacks join the same `polylife_net` network and expose their backend there
+# under the alias `teamN-backend` (see each teams/teamN/docker-compose.yml).
+name: polylife
+
+services:
+  core:
+    build: ..
+    container_name: polylife-core
+    environment:
+      DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,core"
+      DJANGO_SECRET_KEY: "dev-only-insecure-secret-key-change-me-in-production"
+      JWT_SECRET: "dev-only-insecure-jwt-secret-change-me-in-production"
+    networks: [polylife]
+    restart: unless-stopped
+
+  gateway:
+    image: nginx:alpine
+    container_name: polylife-gateway
+    ports:
+      - "8000:80"
+    volumes:
+      - ./gateway.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./snippets:/etc/nginx/snippets:ro
+    environment:
+      # Must equal GATEWAY_SHARED_SECRET in teams/team8/.env
+      TEAM8_GATEWAY_SECRET: ${TEAM8_GATEWAY_SECRET:-dev-only-team8-gateway-secret-change-before-production}
+      NGINX_ENVSUBST_FILTER: TEAM8_
+    depends_on: [core]
+    networks: [polylife]
+    restart: unless-stopped
+
+networks:
+  polylife:
+    name: polylife_net

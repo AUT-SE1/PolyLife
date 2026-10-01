@@ -1,4 +1,10 @@
-"""URL configuration for the PolyLife project."""
+"""URL configuration for the PolyLife project.
+
+The core only serves auth, admin and the SPA. Team services run as separate
+containers behind the shared gateway (see ``deploy/``); the one exception is a
+container that deliberately runs this project with ``TEAM_APPS`` set (team 6),
+in which case that app's routes are mounted as well.
+"""
 
 from django.conf import settings
 from django.contrib import admin
@@ -10,20 +16,10 @@ from core.views import home
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("core.urls")),
-
-    # Team2 microservice routes
-    path("api/team2/", include("teams.team2.urls", namespace="team2")),
-
-    # Catch-all: serve the SPA (and its client-side routes). Must stay last.
-    re_path(r"^.*$", home, name="home"),
 ]
 
 if "teams.team6" in settings.TEAM_APPS:
-    urlpatterns.append(
-        path("api/", include("teams.team6.urls"))
-    )
+    urlpatterns.append(path("api/", include("teams.team6.urls")))
 
-# این مسیر باید همیشه آخر باشد.
-urlpatterns.append(
-    re_path(r"^.*$", home, name="home")
-)
+# Catch-all: serve the SPA (and its client-side routes). Must stay last.
+urlpatterns.append(re_path(r"^.*$", home, name="home"))

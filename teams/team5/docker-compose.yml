@@ -22,8 +22,9 @@ services:
     depends_on:
       - db
     networks:
-      - polylife
-      - team
+      team:
+      polylife:
+        aliases: [team5-backend]   # reached by the shared gateway (deploy/)
     volumes:
       - ./staticfiles:/app/staticfiles
       - ./media:/app/media
