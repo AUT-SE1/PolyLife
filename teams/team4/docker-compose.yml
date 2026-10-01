@@ -40,7 +40,9 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - team
+      team:
+      polylife:
+        aliases: [team4-backend]   # reached by the shared gateway (deploy/)
     volumes:
       - ./backend/media:/app/media
 

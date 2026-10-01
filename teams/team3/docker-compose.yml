@@ -21,7 +21,10 @@ services:
   # backend:
   #   build: .                          # builds this team's Django app
   #   env_file: .env                    # DB creds & secret key come from .env
-  #   networks: [polylife, team]
+  #   networks:
+  #     team:
+  #     polylife:
+  #       aliases: [team3-backend]   # REQUIRED: the shared gateway (deploy/) reaches you by this name
   #
   # db:
   #   image: postgres:16-alpine

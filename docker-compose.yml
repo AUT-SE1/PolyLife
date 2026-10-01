@@ -1,47 +1,20 @@
-version: '3.8'
-
 services:
-  gateway:
+  core:
     build: .
+    container_name: polylife-core
     ports:
-      - "${TEAM_PORT:-8000}:80"
-    networks:
-      - polylife
-    restart: always
-
-  database:
-    image: postgres:16-alpine
-    container_name: team6_db
-    restart: always
+      - "8000:8000"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-team6_db}
-      POSTGRES_USER: ${POSTGRES_USER:-team6_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-team6_password}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,core"
+      DJANGO_SECRET_KEY: "dev-only-insecure-secret-key-change-me-in-production"
+      JWT_SECRET: "dev-only-insecure-jwt-secret-change-me-in-production"
     networks:
       - polylife
+    restart: unless-stopped
 
-  backend:
-    build:
-      context: ./teams/team6
-      dockerfile: Dockerfile
-    container_name: team6_backend
-    restart: always
-    environment:
-      - DB_HOST=database
-      - DB_NAME=${POSTGRES_DB:-team6_db}
-      - DB_USER=${POSTGRES_USER:-team6_user}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-team6_password}
-      - DB_PORT=5432
-    depends_on:
-      - database
-    networks:
-      - polylife
-
-volumes:
-  postgres_data:
-
+# Shared network so each team's gateway can reach the core by name (core:8000).
+# Team stacks join this same network as `external`.
 networks:
   polylife:
-    driver: bridge
+    name: polylife_net

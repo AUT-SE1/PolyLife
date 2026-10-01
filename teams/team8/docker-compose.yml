@@ -23,7 +23,10 @@ services:
       dockerfile: teams/team8/Dockerfile
     restart: unless-stopped
     env_file: .env
-    networks: [polylife, team]
+    networks:
+      team:
+      polylife:
+        aliases: [team8-backend]   # reached by the shared gateway (deploy/)
     depends_on:
       db:
         condition: service_healthy
@@ -37,7 +40,7 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes: [db-data:/var/lib/postgresql/data]
-    networks: [polylife, team]
+    networks: [team]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
@@ -49,7 +52,7 @@ services:
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
     volumes: [redis-data:/data]
-    networks: [polylife, team]
+    networks: [team]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -62,7 +65,7 @@ services:
     env_file: .env
     command: server /data --console-address ":9001"
     volumes: [minio-data:/data]
-    networks: [polylife, team]
+    networks: [team]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s
@@ -72,7 +75,7 @@ services:
   minio-init:
     image: minio/mc:RELEASE.2025-04-16T18-13-26Z
     env_file: .env
-    networks: [polylife, team]
+    networks: [team]
     depends_on:
       minio:
         condition: service_healthy

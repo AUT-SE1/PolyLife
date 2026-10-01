@@ -45,8 +45,9 @@ services:
         condition: service_healthy
 
     networks:
-      - polylife_net
-      - team6_private
+      team6_private:
+      polylife_net:
+        aliases: [team6-backend]   # reached by the shared gateway (deploy/)
 
   db:
     image: postgres:16-alpine

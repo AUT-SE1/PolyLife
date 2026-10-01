@@ -73,7 +73,8 @@ services:
       team2_redis:
         condition: service_healthy
     networks:
-      - polylife_net
+      polylife_net:
+        aliases: [team2-backend]   # reached by the shared gateway (deploy/)
     ports:
       - "8002:8000"
   # --------------------------------------------------------------------------

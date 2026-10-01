@@ -69,6 +69,7 @@ backend + database.
 | Start one team | `scripts/bash/start-team.sh N` |
 | Start everything | `scripts/bash/start-core.sh` then `scripts/bash/start-all-teams.sh` |
 | Stop everything | `scripts/bash/stop-all.sh` |
+| Core + shared gateway + teams (single entry `:8000`, `/api/teamN/…`) | `scripts/bash/start-platform.sh` (see `deploy/README.md`) |
 
 PowerShell mirrors in `scripts/windows/`.
 
