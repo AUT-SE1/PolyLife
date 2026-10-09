@@ -48,7 +48,15 @@ backend:
       aliases: [teamN-backend]
 ```
 
-Teams 1 and 3 have this in their commented-out `backend` block — keep it when you enable it.
+Teams 1 and 3 run their skeleton app on the core's Django project (`TEAM_APPS=teams.teamN`,
+`Dockerfile.backend`, like team 6) so their routes are live; swap in your own stack but keep the alias.
+
+Rules that keep the shared `polylife_net` safe:
+
+* Only a backend's **alias** (`teamN-backend`) is unique on `polylife_net`. Per-team gateways must proxy to
+  that alias, never to the bare name `backend`, and databases/redis stay on the team's private network
+  (a bare `db` on the shared net would resolve to another team's database).
+* Nothing may bypass the gateway: do not publish a backend on a host port (team 2's dev ports are loopback-only).
 
 ## Notes
 

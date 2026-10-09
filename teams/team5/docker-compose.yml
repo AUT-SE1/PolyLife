@@ -26,8 +26,8 @@ services:
       polylife:
         aliases: [team5-backend]   # reached by the shared gateway (deploy/)
     volumes:
-      - ./staticfiles:/app/staticfiles
-      - ./media:/app/media
+      - ./staticfiles:/app/teams/team5/staticfiles
+      - ./media:/app/teams/team5/media
 
   db:
     image: postgres:16-alpine

@@ -24,11 +24,11 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - team2_mongo_data:/data/db
     networks:
-      - polylife_net
+      - team2_private
       
   # --------------------------------------------------------------------------
   # Redis — Message broker for Celery + session/cache store
@@ -38,11 +38,11 @@ services:
     container_name: team2_redis
     restart: unless-stopped
     ports:
-      - "6382:6379"       # Exposed on 6382 to avoid conflicts with other teams
+      - "127.0.0.1:6382:6379"   # loopback only; 6382 avoids conflicts with other teams
     volumes:
       - team2_redis_data:/data
     networks:
-      - polylife_net
+      - team2_private
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -73,10 +73,11 @@ services:
       team2_redis:
         condition: service_healthy
     networks:
+      team2_private:
       polylife_net:
         aliases: [team2-backend]   # reached by the shared gateway (deploy/)
     ports:
-      - "8002:8000"
+      - "127.0.0.1:8002:8000"   # dev only: bypasses the gateway, so loopback only
   # --------------------------------------------------------------------------
   # Celery Worker — Processes queued tasks (reminder notifications)
   # --------------------------------------------------------------------------
@@ -105,7 +106,7 @@ services:
       team2_backend:
         condition: service_started
     networks:
-      - polylife_net
+      - team2_private
 
   # --------------------------------------------------------------------------
   # Celery Beat — Periodic task scheduler (uses DB scheduler)
@@ -132,7 +133,7 @@ services:
       team2_backend:
         condition: service_started
     networks:
-      - polylife_net
+      - team2_private
 
   # --------------------------------------------------------------------------
   # Nginx Gateway — Entry point for all team2 API requests
@@ -164,6 +165,7 @@ volumes:
 # Networks — shared across all team stacks
 # ---------------------------------------------------------------------------
 networks:
+  team2_private:          # db / redis / worker / beat (invisible to other teams)
   polylife_net:
     external: true
 
