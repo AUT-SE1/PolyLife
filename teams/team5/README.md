@@ -21,6 +21,8 @@ un.ps1` on Windows.
 | `.env.example` | local environment defaults |
 
 ## Notes
+- The app is the package `teams.team5`: the image copies this folder to `/app/teams/team5` with `PYTHONPATH=/app`
+  (locally: `PYTHONPATH=<repo root> python manage.py ...` from this folder). Static files are served by WhiteNoise.
 - The backend listens on port `8000` inside the compose network.
 - Use `DATABASE_URL` from `.env` for the team database.
 - Do not decode JWTs in this service; the gateway already authenticates the user.

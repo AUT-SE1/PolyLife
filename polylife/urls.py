@@ -18,8 +18,9 @@ urlpatterns = [
     path("api/", include("core.urls")),
 ]
 
-if "teams.team6" in settings.TEAM_APPS:
-    urlpatterns.append(path("api/", include("teams.team6.urls")))
+for _app in settings.TEAM_APPS:
+    # team6's urls are relative to /api/; other teams' urls already start with "api/".
+    urlpatterns.append(path("api/" if _app == "teams.team6" else "", include(f"{_app}.urls")))
 
 # Catch-all: serve the SPA (and its client-side routes). Must stay last.
 urlpatterns.append(re_path(r"^.*$", home, name="home"))
